@@ -1,22 +1,133 @@
 //import Player from "./player.js";
 
+function drawMap() {
+  for (var i = 0; i < 40; i++) {
+    for (var j = 0; j < 20; j++) {
+      if (inArea(i * 64, j * 64, 0, 0, width, height)) {
+        if (map[i][j] == 1) {
+          image("./Assets/Blocks/FloorTile.png", i * 64, j * 64, 64, 64);
+        }
+      }
+    }
+  }
+}
+
 class Player {
   //using # makes it private
   #x = 0;
   #y = 0;
+  #speed = 10;
 
   Player(x, y) {
     this.x = x;
     this.y = y;
   }
-
+  render(anim) {
+    if (anim == "walkforward") {
+      if (myGameArea.frameNo % 40 > 20) {
+        cropImage(
+          "./Assets/Player.png",
+          this.x,
+          this.y,
+          16 * 4,
+          32 * 4,
+          16 * 2,
+          0,
+          16,
+          32
+        );
+      } else {
+        cropImage(
+          "./Assets/Player.png",
+          this.x,
+          this.y,
+          16 * 4,
+          32 * 4,
+          16 * 3,
+          0,
+          16,
+          32
+        );
+      }
+    } else if (anim == "walkbackward") {
+      if (myGameArea.frameNo % 40 > 20) {
+        cropImage(
+          "./Assets/Player.png",
+          this.x,
+          this.y,
+          16 * 4,
+          32 * 4,
+          16 * 4,
+          0,
+          16,
+          32
+        );
+      } else {
+        cropImage(
+          "./Assets/Player.png",
+          this.x,
+          this.y,
+          16 * 4,
+          32 * 4,
+          16 * 5,
+          0,
+          16,
+          32
+        );
+      }
+    } else {
+      cropImage(
+        "./Assets/Player.png",
+        this.x,
+        this.y,
+        16 * 4,
+        32 * 4,
+        0,
+        0,
+        16,
+        32
+      );
+    }
+  }
   update() {
-    console.log("Updated Player");
-    if (mousePressed) fill("blue");
-    else fill("red");
+    if (myGameArea.frameNo == 1) {
+      this.x = 10;
+      this.y = 10;
+    }
+    let currentAnim = "";
 
+    //console.log("Updated Player");
+    //this.x = mouseX;
+    //this.y = mouseY;
+    if (
+      keys[controls[0]] ||
+      keys[controls[1]] ||
+      keys[controls[2]] ||
+      keys[controls[3]]
+    ) {
+      if (keys[controls[0]] == true) {
+        this.y -= this.#speed;
+        currentAnim = "walkbackward";
+      }
+      if (keys[controls[1]] == true) {
+        this.x -= this.#speed;
+        currentAnim = "walkforward";
+      }
+      if (keys[controls[2]] == true) {
+        this.y += this.#speed;
+        currentAnim = "walkforward";
+      }
+      if (keys[controls[3]] == true) {
+        this.x += this.#speed;
+        currentAnim = "walkforward";
+      }
+      this.render(currentAnim);
+    } else {
+      this.render("still");
+    }
     //rect(mouseX, mouseY, 100, 100);
-    image("./Assets/Player.png", mouseX, mouseY, 64, 128);
+    //image("./Assets/Player.png", mouseX, mouseY, 64, 128);
+    //cropImage("./Assets/Player.png", mouseX, mouseY, 64, 128, 16, 0, 32, 32);
   }
 
   get getX() {
@@ -32,6 +143,26 @@ class Player {
   }
 }
 
+//WASD
+//87 65 83 68
+
+let mapWidth = 200;
+let mapHeight = 200;
+
+var map = new Array(mapWidth);
+for (var i = 0; i < map.length; i++) {
+  map[i] = new Array(mapHeight);
+}
+
+//----------------------------------------Temp set map to wood
+
+for (var i = 0; i < mapWidth; i++) {
+  for (var j = 0; j < mapHeight; j++) {
+    map[i][j] = 1;
+  }
+}
+//-------------------------------------------
+
 var myGamePiece;
 var myObstacles = [];
 var myScore;
@@ -42,6 +173,9 @@ let height = window.innerHeight;
 
 let mousePressed = false;
 let mouseX, mouseY;
+let controls = [87, 65, 83, 68];
+
+let keys = new Array(255);
 
 let myGameArea = {
   canvas: document.createElement("canvas"),
@@ -58,6 +192,12 @@ let myGameArea = {
     window.addEventListener("mousemove", function (e) {
       mouseX = e.x;
       mouseY = e.y;
+    });
+    window.addEventListener("keydown", function (e) {
+      keys[event.keyCode] = true;
+    });
+    window.addEventListener("keyup", function (e) {
+      keys[event.keyCode] = false;
     });
     this.interval = setInterval(updateGameArea, 20);
   },
@@ -131,9 +271,33 @@ function image(image, x, y, w, h) {
 
   myGameArea.context.drawImage(img, x, y, w, h);
 }
+
+function inArea(X, Y, x, y, w, h) {
+  if (X > x - 1 && Y > y - 1 && X < x + w && Y < y + h) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function cropImage(image, x, y, w, h, cropX, cropY, cropW, cropH) {
+  var img = new Image();
+
+  img.src = image;
+  var upscaledCanvas = document.getElementById("canvas").getContext("2d");
+
+  upscaledCanvas.mozImageSmoothingEnabled = false;
+  upscaledCanvas.webkitImageSmoothingEnabled = false;
+  upscaledCanvas.msImageSmoothingEnabled = false;
+  upscaledCanvas.imageSmoothingEnabled = false;
+  upscaledCanvas.drawImage(img, cropX, cropY, cropW, cropH, x, y, w, h);
+
+  //upscaledCanvas.drawImage(img, -x, -y, w - x, h -, x, y, cropW, cropH);
+}
 function updateGameArea() {
   myGameArea.clear();
   myGameArea.frameNo += 1;
+  drawMap();
   localPlayer.update();
 
   if (myGameArea.frameNo == 1 || everyinterval(150)) {
