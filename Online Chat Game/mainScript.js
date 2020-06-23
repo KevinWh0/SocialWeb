@@ -4,8 +4,98 @@ function drawMap() {
   for (var i = 0; i < 40; i++) {
     for (var j = 0; j < 20; j++) {
       if (inArea(i * 64, j * 64, 0, 0, width, height)) {
+        if (inArea(mouseX, mouseY, i * 64, j * 64, 64, 64) && mousePressed) {
+          map[i][j] = 2;
+        }
         if (map[i][j] == 1) {
           renderImage(tiles[0], i * 64, j * 64, 64, 64);
+        } else if (map[i][j] == 2) {
+          renderImage(tiles[0], i * 64, j * 64, 64, 64);
+
+          try {
+            if (
+              map[i + 1][j] == 2 &&
+              map[i - 1][j] == 2 &&
+              map[i][j - 1] != 2
+            ) {
+              cropImage(tiles[1], i * 64, j * 64, 64, 64, 1 * 16, 0, 16, 16);
+            } else if (
+              map[i + 1][j] == 2 &&
+              map[i - 1][j] == 2 &&
+              map[i][j + 1] != 2
+            ) {
+              saveScreenSettings();
+              rotate(i * 64 + 64, j * 64 + 64, 180);
+              cropImage(tiles[1], 0, 0, 64, 64, 1 * 16, 0, 16, 16);
+              restoreScreenSettings();
+            } else if (
+              map[i][j + 1] == 2 &&
+              map[i][j - 1] == 2 &&
+              map[i + 1][j] != 2
+            ) {
+              saveScreenSettings();
+              rotate(i * 64, j * 64, 90);
+              cropImage(tiles[1], 0, -64, 64, 64, 1 * 16, 0, 16, 16);
+              restoreScreenSettings();
+            } else if (
+              map[i][j + 1] == 2 &&
+              map[i][j - 1] == 2 &&
+              map[i - 1][j] != 2
+            ) {
+              saveScreenSettings();
+              rotate(i * 64, j * 64, 90 + 180);
+              cropImage(tiles[1], -64, 0, 64, 64, 1 * 16, 0, 16, 16);
+              restoreScreenSettings();
+            } else if (
+              map[i + 1][j] == 2 &&
+              map[i][j + 1] == 2 &&
+              map[i][j - 1] != 2
+            ) {
+              cropImage(tiles[1], i * 64, j * 64, 64, 64, 2 * 16, 0, 16, 16);
+            } else if (
+              map[i - 1][j] == 2 &&
+              map[i][j - 1] != 2 &&
+              map[i][j + 1] == 2
+            ) {
+              saveScreenSettings();
+              rotate(i * 64, j * 64, 90);
+              cropImage(tiles[1], 0, -64, 64, 64, 2 * 16, 0, 16, 16);
+              restoreScreenSettings();
+            } else if (
+              map[i - 1][j] == 2 &&
+              map[i][j - 1] == 2 &&
+              map[i][j + 1] != 2 &&
+              map[i + 1][j] != 2
+            ) {
+              saveScreenSettings();
+              rotate(i * 64, j * 64, 180);
+              cropImage(tiles[1], -64, -64, 64, 64, 2 * 16, 0, 16, 16);
+              restoreScreenSettings();
+            } else if (
+              map[i + 1][j] == 2 &&
+              map[i][j - 1] == 2 &&
+              map[i][j + 1] != 2 &&
+              map[i - 1][j] != 2
+            ) {
+              saveScreenSettings();
+              rotate(i * 64, j * 64, 270);
+              cropImage(tiles[1], -64, 0, 64, 64, 2 * 16, 0, 16, 16);
+              restoreScreenSettings();
+            } else {
+              cropImage(tiles[1], i * 64, j * 64, 64, 64, 0 * 16, 0, 16, 16);
+            }
+          } catch (error) {
+            cropImage(tiles[1], i * 64, j * 64, 64, 64, 0 * 16, 0, 16, 16);
+          }
+
+          /*
+                        saveScreenSettings();
+              rotate(i * 64, j * 64, mouseX);
+              cropImage(tiles[1], 0, -64, 64, 64, 2 * 16, 0, 16, 16);
+              restoreScreenSettings();
+          */
+          //renderImage(tiles[1], i * 64, j * 64, 64, 64);
+          //cropImage(tiles[1], i * 64, j * 64, 64, 64, 0 * 16, 0, 16, 16);
         }
       }
     }
@@ -126,6 +216,7 @@ class Player {
 
 //WASD
 //87 65 83 68
+
 var player = new Image();
 player.src = "./Assets/Player.png";
 
@@ -134,6 +225,7 @@ for (var i = 0; i < tiles.length; i++) {
   tiles[i] = new Image();
 }
 tiles[0].src = "./Assets/Blocks/FloorTile.png";
+tiles[1].src = "./Assets/Blocks/Carpet.png";
 
 let mapWidth = 200;
 let mapHeight = 200;
@@ -148,10 +240,12 @@ for (var i = 0; i < map.length; i++) {
 for (var i = 0; i < mapWidth; i++) {
   for (var j = 0; j < mapHeight; j++) {
     map[i][j] = 1;
+    //map[i][j] = Math.round(Math.random(2)) + 1;
   }
 }
 //-------------------------------------------
 var lastRender = Date.now();
+let fps;
 
 var myGamePiece;
 var myObstacles = [];
@@ -202,6 +296,7 @@ let myGameArea = {
 startGame();
 
 function startGame() {
+  console.log(readTextFile("./Maps/Home.txt"));
   localPlayer = new Player(0, 0);
 
   myGamePiece = new component(30, 30, "red", 10, 120);
@@ -304,6 +399,32 @@ function cropImage(img, x, y, w, h, cropX, cropY, cropW, cropH) {
 
   //upscaledCanvas.drawImage(img, -x, -y, w - x, h -, x, y, cropW, cropH);
 }
+
+function rotate(x, y, deg) {
+  var upscaledCanvas = document.getElementById("canvas").getContext("2d");
+  upscaledCanvas.translate(x, y);
+  upscaledCanvas.rotate((deg * Math.PI) / 180);
+}
+function saveScreenSettings() {
+  var upscaledCanvas = document.getElementById("canvas").getContext("2d");
+  upscaledCanvas.save();
+}
+function restoreScreenSettings() {
+  var upscaledCanvas = document.getElementById("canvas").getContext("2d");
+  upscaledCanvas.restore();
+}
+
+function readTextFile(file) {
+  fetch(file)
+    .then((response) => response.text())
+    .then((text) => {
+      console.log(text);
+      i = text;
+      return text;
+    });
+  return null;
+}
+
 function updateGameArea() {
   var delta = (Date.now() - lastRender) / 1000;
   lastRender = Date.now();
@@ -311,9 +432,12 @@ function updateGameArea() {
   myGameArea.frameNo += 1;
   drawMap();
   localPlayer.update();
-  fill("red");
+
+  fps = Math.round(1 / delta);
+  fill("white");
+  if (fps < 15) fill("red");
   setFontSize(30);
-  text(1 / delta + " FPS", 10, 30);
+  text(fps + " FPS", 10, 30);
 
   if (everyinterval(150)) {
   }
