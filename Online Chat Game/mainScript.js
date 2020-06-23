@@ -1,31 +1,85 @@
 //import Player from "./player.js";
-
+let mapOffsetX = 0;
+let mapOffsetY = 0;
 function drawMap() {
+  mapOffsetX = -localPlayer.x;
+  mapOffsetY = -localPlayer.y;
   for (var i = 0; i < 40; i++) {
     for (var j = 0; j < 20; j++) {
-      if (inArea(i * 64, j * 64, 0, 0, width, height)) {
-        if (inArea(mouseX, mouseY, i * 64, j * 64, 64, 64) && mousePressed) {
-          map[i][j] = 2;
+      if (
+        inArea(
+          (i + 1) * 64 + mapOffsetX,
+          (j + 1) * 64 + mapOffsetY,
+          0,
+          0,
+          width + 64,
+          height + 64
+        )
+      ) {
+        if (
+          inArea(
+            mouseX,
+            mouseY,
+            i * 64 + mapOffsetX,
+            j * 64 + mapOffsetY,
+            64,
+            64
+          ) &&
+          mousePressed
+        ) {
+          map[i][j] = localPlayer.placing;
         }
-        if (map[i][j] == 1) {
-          renderImage(tiles[0], i * 64, j * 64, 64, 64);
-        } else if (map[i][j] == 2) {
-          renderImage(tiles[0], i * 64, j * 64, 64, 64);
 
+        if (map[i][j] == 1) {
+          renderImage(
+            tiles[0],
+            i * 64 + mapOffsetX,
+            j * 64 + mapOffsetY,
+            64,
+            64
+          );
+        } else if (map[i][j] == 2) {
           try {
+            if (
+              !(
+                map[i + 1][j] == 2 &&
+                map[i - 1][j] == 2 &&
+                map[i][j + 1] == 2 &&
+                map[i][j - 1] == 2
+              )
+            ) {
+              renderImage(
+                tiles[0],
+                i * 64 + mapOffsetX,
+                j * 64 + mapOffsetY,
+                64,
+                64
+              );
+            }
+
             if (
               map[i + 1][j] == 2 &&
               map[i - 1][j] == 2 &&
               map[i][j - 1] != 2
             ) {
-              cropImage(tiles[1], i * 64, j * 64, 64, 64, 1 * 16, 0, 16, 16);
+              cropImage(
+                tiles[1],
+                i * 64 + mapOffsetX,
+                j * 64 + mapOffsetY,
+                64,
+                64,
+                1 * 16,
+                0,
+                16,
+                16
+              );
             } else if (
               map[i + 1][j] == 2 &&
               map[i - 1][j] == 2 &&
               map[i][j + 1] != 2
             ) {
               saveScreenSettings();
-              rotate(i * 64 + 64, j * 64 + 64, 180);
+              rotate(i * 64 + 64 + mapOffsetX, j * 64 + 64 + mapOffsetY, 180);
               cropImage(tiles[1], 0, 0, 64, 64, 1 * 16, 0, 16, 16);
               restoreScreenSettings();
             } else if (
@@ -34,7 +88,7 @@ function drawMap() {
               map[i + 1][j] != 2
             ) {
               saveScreenSettings();
-              rotate(i * 64, j * 64, 90);
+              rotate(i * 64 + mapOffsetX, j * 64 + mapOffsetY, 90);
               cropImage(tiles[1], 0, -64, 64, 64, 1 * 16, 0, 16, 16);
               restoreScreenSettings();
             } else if (
@@ -43,7 +97,7 @@ function drawMap() {
               map[i - 1][j] != 2
             ) {
               saveScreenSettings();
-              rotate(i * 64, j * 64, 90 + 180);
+              rotate(i * 64 + mapOffsetX, j * 64 + mapOffsetY, 90 + 180);
               cropImage(tiles[1], -64, 0, 64, 64, 1 * 16, 0, 16, 16);
               restoreScreenSettings();
             } else if (
@@ -51,14 +105,24 @@ function drawMap() {
               map[i][j + 1] == 2 &&
               map[i][j - 1] != 2
             ) {
-              cropImage(tiles[1], i * 64, j * 64, 64, 64, 2 * 16, 0, 16, 16);
+              cropImage(
+                tiles[1],
+                i * 64 + mapOffsetX,
+                j * 64 + mapOffsetY,
+                64,
+                64,
+                2 * 16,
+                0,
+                16,
+                16
+              );
             } else if (
               map[i - 1][j] == 2 &&
               map[i][j - 1] != 2 &&
               map[i][j + 1] == 2
             ) {
               saveScreenSettings();
-              rotate(i * 64, j * 64, 90);
+              rotate(i * 64 + mapOffsetX, j * 64 + mapOffsetY, 90);
               cropImage(tiles[1], 0, -64, 64, 64, 2 * 16, 0, 16, 16);
               restoreScreenSettings();
             } else if (
@@ -68,7 +132,7 @@ function drawMap() {
               map[i + 1][j] != 2
             ) {
               saveScreenSettings();
-              rotate(i * 64, j * 64, 180);
+              rotate(i * 64 + mapOffsetX, j * 64 + mapOffsetY, 180);
               cropImage(tiles[1], -64, -64, 64, 64, 2 * 16, 0, 16, 16);
               restoreScreenSettings();
             } else if (
@@ -78,14 +142,34 @@ function drawMap() {
               map[i - 1][j] != 2
             ) {
               saveScreenSettings();
-              rotate(i * 64, j * 64, 270);
+              rotate(i * 64 + mapOffsetX, j * 64 + mapOffsetY, 270);
               cropImage(tiles[1], -64, 0, 64, 64, 2 * 16, 0, 16, 16);
               restoreScreenSettings();
             } else {
-              cropImage(tiles[1], i * 64, j * 64, 64, 64, 0 * 16, 0, 16, 16);
+              cropImage(
+                tiles[1],
+                i * 64 + mapOffsetX,
+                j * 64 + mapOffsetY,
+                64,
+                64,
+                0 * 16,
+                0,
+                16,
+                16
+              );
             }
           } catch (error) {
-            cropImage(tiles[1], i * 64, j * 64, 64, 64, 0 * 16, 0, 16, 16);
+            cropImage(
+              tiles[1],
+              i * 64 + mapOffsetX,
+              j * 64 + mapOffsetY,
+              64,
+              64,
+              0 * 16,
+              0,
+              16,
+              16
+            );
           }
 
           /*
@@ -96,6 +180,34 @@ function drawMap() {
           */
           //renderImage(tiles[1], i * 64, j * 64, 64, 64);
           //cropImage(tiles[1], i * 64, j * 64, 64, 64, 0 * 16, 0, 16, 16);
+        } else if (map[i][j] == 3) {
+          try {
+            if (map[i][j - 1] == 3) {
+              cropImage(
+                tiles[2],
+                i * 64 + mapOffsetX,
+                j * 64 + mapOffsetY,
+                64,
+                64,
+                0 * 16,
+                0,
+                16,
+                16
+              );
+            } else {
+              cropImage(
+                tiles[2],
+                i * 64 + mapOffsetX,
+                j * 64 + mapOffsetY,
+                64,
+                64,
+                1 * 16,
+                0,
+                16,
+                16
+              );
+            }
+          } catch (error) {}
         }
       }
     }
@@ -106,6 +218,7 @@ class Player {
   //using # makes it private
   x = 0;
   y = 0;
+  placing = 3;
   #speed = 10;
   talking = false;
   #chatbar = "";
@@ -115,6 +228,7 @@ class Player {
     this.y = y;
   }
   render(anim) {
+    /*
     if (anim == "walkforward") {
       if (myGameArea.frameNo % 40 > 20) {
         cropImage(player, this.x, this.y, 16 * 4, 32 * 4, 16 * 2, 0, 16, 32);
@@ -129,6 +243,71 @@ class Player {
       }
     } else {
       cropImage(player, this.x, this.y, 16 * 4, 32 * 4, 0, 0, 16, 32);
+    }*/
+    if (anim == "walkforward") {
+      if (myGameArea.frameNo % 40 > 20) {
+        cropImage(
+          player,
+          width / 2 - 16 * 2,
+          height / 2 - 32 * 2,
+          16 * 4,
+          32 * 4,
+          16 * 2,
+          0,
+          16,
+          32
+        );
+      } else {
+        cropImage(
+          player,
+          width / 2 - 16 * 2,
+          height / 2 - 32 * 2,
+          16 * 4,
+          32 * 4,
+          16 * 3,
+          0,
+          16,
+          32
+        );
+      }
+    } else if (anim == "walkbackward") {
+      if (myGameArea.frameNo % 40 > 20) {
+        cropImage(
+          player,
+          width / 2 - 16 * 2,
+          height / 2 - 32 * 2,
+          16 * 4,
+          32 * 4,
+          16 * 4,
+          0,
+          16,
+          32
+        );
+      } else {
+        cropImage(
+          player,
+          width / 2 - 16 * 2,
+          height / 2 - 32 * 2,
+          16 * 4,
+          32 * 4,
+          16 * 5,
+          0,
+          16,
+          32
+        );
+      }
+    } else {
+      cropImage(
+        player,
+        width / 2 - 16 * 2,
+        height / 2 - 32 * 2,
+        16 * 4,
+        32 * 4,
+        0,
+        0,
+        16,
+        32
+      );
     }
   }
   update() {
@@ -137,7 +316,15 @@ class Player {
     let velX = 0,
       velY = 0;
 
-    if (keys[controls[4]]) {
+    if (keys[40]) {
+      //DOWN
+      this.placing--;
+    } else if (keys[38]) {
+      //UP
+      this.placing++;
+    }
+
+    if (keys[controls[4]] && this.talking == false) {
       //Talk key
       this.talking = true;
       keyPressed = -1;
@@ -146,14 +333,19 @@ class Player {
       if (keyPressed == 13) {
         this.#chatbar = "";
         this.talking = false;
-      } else if (keyPressed != -1) {
+      } else if (keyPressed == 8) {
+        this.#chatbar = this.#chatbar.substring(0, this.#chatbar.length - 1);
+      } else if (keyPressed != -1 && keyPressed != 16) {
         //console.log(this.#chatbar);
-
         this.#chatbar = this.#chatbar + String.fromCharCode(keyPressed);
       }
-      fill("red");
-      setFontSize(20);
-      text(this.#chatbar, this.x, this.y);
+      fill("white");
+      setFontSize(15);
+      text(
+        this.#chatbar,
+        width / 2 - this.#chatbar.length * 5,
+        height / 2 - 60
+      );
     }
     if (
       (keys[controls[0]] ||
@@ -226,6 +418,7 @@ for (var i = 0; i < tiles.length; i++) {
 }
 tiles[0].src = "./Assets/Blocks/FloorTile.png";
 tiles[1].src = "./Assets/Blocks/Carpet.png";
+tiles[2].src = "./Assets/Blocks/StoneBrickWall.png";
 
 let mapWidth = 200;
 let mapHeight = 200;
@@ -281,7 +474,7 @@ let myGameArea = {
     window.addEventListener("keydown", function (e) {
       keys[event.keyCode] = true;
       keyPressed = event.keyCode;
-      //console.log(event.keyCode);
+      //  console.log(event.keyCode);
     });
     window.addEventListener("keyup", function (e) {
       keys[event.keyCode] = false;
@@ -307,6 +500,7 @@ function startGame() {
   window.addEventListener("keydown", function (e) {
     myGameArea.keys = myGameArea.keys || [];
     myGameArea.keys[e.keyCode] = true;
+    //console.log(e.keyCode);
   });
   window.addEventListener("keyup", function (e) {
     myGameArea.keys[e.keyCode] = false;
@@ -414,15 +608,12 @@ function restoreScreenSettings() {
   upscaledCanvas.restore();
 }
 
-function readTextFile(file) {
-  fetch(file)
+async function readTextFile(file) {
+  const respon = await fetch(file)
     .then((response) => response.text())
-    .then((text) => {
-      console.log(text);
-      i = text;
-      return text;
-    });
-  return null;
+    .then((text) => {});
+
+  return respon;
 }
 
 function updateGameArea() {
@@ -437,7 +628,7 @@ function updateGameArea() {
   fill("white");
   if (fps < 15) fill("red");
   setFontSize(30);
-  text(fps + " FPS", 10, 30);
+  text(fps + " FPS" + " Placing: " + localPlayer.placing, 10, 30);
 
   if (everyinterval(150)) {
   }
