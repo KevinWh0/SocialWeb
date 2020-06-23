@@ -5,7 +5,7 @@ function drawMap() {
     for (var j = 0; j < 20; j++) {
       if (inArea(i * 64, j * 64, 0, 0, width, height)) {
         if (map[i][j] == 1) {
-          image("./Assets/Blocks/FloorTile.png", i * 64, j * 64, 64, 64);
+          renderImage(tiles[0], i * 64, j * 64, 64, 64);
         }
       }
     }
@@ -14,9 +14,11 @@ function drawMap() {
 
 class Player {
   //using # makes it private
-  #x = 0;
-  #y = 0;
+  x = 0;
+  y = 0;
   #speed = 10;
+  talking = false;
+  #chatbar = "";
 
   Player(x, y) {
     this.x = x;
@@ -25,102 +27,81 @@ class Player {
   render(anim) {
     if (anim == "walkforward") {
       if (myGameArea.frameNo % 40 > 20) {
-        cropImage(
-          "./Assets/Player.png",
-          this.x,
-          this.y,
-          16 * 4,
-          32 * 4,
-          16 * 2,
-          0,
-          16,
-          32
-        );
+        cropImage(player, this.x, this.y, 16 * 4, 32 * 4, 16 * 2, 0, 16, 32);
       } else {
-        cropImage(
-          "./Assets/Player.png",
-          this.x,
-          this.y,
-          16 * 4,
-          32 * 4,
-          16 * 3,
-          0,
-          16,
-          32
-        );
+        cropImage(player, this.x, this.y, 16 * 4, 32 * 4, 16 * 3, 0, 16, 32);
       }
     } else if (anim == "walkbackward") {
       if (myGameArea.frameNo % 40 > 20) {
-        cropImage(
-          "./Assets/Player.png",
-          this.x,
-          this.y,
-          16 * 4,
-          32 * 4,
-          16 * 4,
-          0,
-          16,
-          32
-        );
+        cropImage(player, this.x, this.y, 16 * 4, 32 * 4, 16 * 4, 0, 16, 32);
       } else {
-        cropImage(
-          "./Assets/Player.png",
-          this.x,
-          this.y,
-          16 * 4,
-          32 * 4,
-          16 * 5,
-          0,
-          16,
-          32
-        );
+        cropImage(player, this.x, this.y, 16 * 4, 32 * 4, 16 * 5, 0, 16, 32);
       }
     } else {
-      cropImage(
-        "./Assets/Player.png",
-        this.x,
-        this.y,
-        16 * 4,
-        32 * 4,
-        0,
-        0,
-        16,
-        32
-      );
+      cropImage(player, this.x, this.y, 16 * 4, 32 * 4, 0, 0, 16, 32);
     }
   }
   update() {
-    if (myGameArea.frameNo == 1) {
-      this.x = 10;
-      this.y = 10;
-    }
     let currentAnim = "";
+    let totalKeysPressed = 0;
+    let velX = 0,
+      velY = 0;
 
-    //console.log("Updated Player");
-    //this.x = mouseX;
-    //this.y = mouseY;
+    if (keys[controls[4]]) {
+      //Talk key
+      this.talking = true;
+      keyPressed = -1;
+    }
+    if (this.talking) {
+      if (keyPressed == 13) {
+        this.#chatbar = "";
+        this.talking = false;
+      } else if (keyPressed != -1) {
+        //console.log(this.#chatbar);
+
+        this.#chatbar = this.#chatbar + String.fromCharCode(keyPressed);
+      }
+      fill("red");
+      setFontSize(20);
+      text(this.#chatbar, this.x, this.y);
+    }
     if (
-      keys[controls[0]] ||
-      keys[controls[1]] ||
-      keys[controls[2]] ||
-      keys[controls[3]]
+      (keys[controls[0]] ||
+        keys[controls[1]] ||
+        keys[controls[2]] ||
+        keys[controls[3]]) &&
+      this.talking == false
     ) {
       if (keys[controls[0]] == true) {
-        this.y -= this.#speed;
+        //this.y -= this.#speed;
+        velY = -this.#speed;
+        totalKeysPressed++;
         currentAnim = "walkbackward";
       }
       if (keys[controls[1]] == true) {
-        this.x -= this.#speed;
+        //this.x -= this.#speed;
+        velX = -this.#speed;
+        totalKeysPressed++;
         currentAnim = "walkforward";
       }
       if (keys[controls[2]] == true) {
-        this.y += this.#speed;
+        //this.y += this.#speed;
+        velY = this.#speed;
+        totalKeysPressed++;
         currentAnim = "walkforward";
       }
       if (keys[controls[3]] == true) {
-        this.x += this.#speed;
+        //this.x += this.#speed;
+        velX = this.#speed;
+        totalKeysPressed++;
         currentAnim = "walkforward";
       }
+      if (totalKeysPressed > 1) {
+        velX = Math.floor(velX / 1.5) + 1;
+        velY = Math.floor(velY / 1.5) + 1;
+      }
+      this.x += velX;
+      this.y += velY;
       this.render(currentAnim);
     } else {
       this.render("still");
@@ -145,6 +126,14 @@ class Player {
 
 //WASD
 //87 65 83 68
+var player = new Image();
+player.src = "./Assets/Player.png";
+
+var tiles = new Array(20);
+for (var i = 0; i < tiles.length; i++) {
+  tiles[i] = new Image();
+}
+tiles[0].src = "./Assets/Blocks/FloorTile.png";
 
 let mapWidth = 200;
 let mapHeight = 200;
@@ -162,6 +151,7 @@ for (var i = 0; i < mapWidth; i++) {
   }
 }
 //-------------------------------------------
+var lastRender = Date.now();
 
 var myGamePiece;
 var myObstacles = [];
@@ -173,8 +163,9 @@ let height = window.innerHeight;
 
 let mousePressed = false;
 let mouseX, mouseY;
-let controls = [87, 65, 83, 68];
-
+//WASD T(talking)
+let controls = [87, 65, 83, 68, 84];
+let keyPressed = -1;
 let keys = new Array(255);
 
 let myGameArea = {
@@ -195,6 +186,8 @@ let myGameArea = {
     });
     window.addEventListener("keydown", function (e) {
       keys[event.keyCode] = true;
+      keyPressed = event.keyCode;
+      //console.log(event.keyCode);
     });
     window.addEventListener("keyup", function (e) {
       keys[event.keyCode] = false;
@@ -259,7 +252,14 @@ function fill(col) {
 function rect(x, y, w, h) {
   myGameArea.context.fillRect(x, y, w, h);
 }
+function setFontSize(size) {
+  myGameArea.context.font = size + "px Arial";
+}
+function text(text, x, y) {
+  myGameArea.context.fillText(text, x, y);
+}
 function image(image, x, y, w, h) {
+  //OUTDATED DONT USE
   var img = new Image();
 
   img.src = image;
@@ -272,6 +272,16 @@ function image(image, x, y, w, h) {
   myGameArea.context.drawImage(img, x, y, w, h);
 }
 
+function renderImage(image, x, y, w, h) {
+  var upscaledCanvas = document.getElementById("canvas").getContext("2d");
+  upscaledCanvas.mozImageSmoothingEnabled = false;
+  upscaledCanvas.webkitImageSmoothingEnabled = false;
+  upscaledCanvas.msImageSmoothingEnabled = false;
+  upscaledCanvas.imageSmoothingEnabled = false;
+
+  myGameArea.context.drawImage(image, x, y, w, h);
+}
+
 function inArea(X, Y, x, y, w, h) {
   if (X > x - 1 && Y > y - 1 && X < x + w && Y < y + h) {
     return true;
@@ -280,10 +290,10 @@ function inArea(X, Y, x, y, w, h) {
   }
 }
 
-function cropImage(image, x, y, w, h, cropX, cropY, cropW, cropH) {
-  var img = new Image();
+function cropImage(img, x, y, w, h, cropX, cropY, cropW, cropH) {
+  //var img = new Image();
 
-  img.src = image;
+  //img.src = image;
   var upscaledCanvas = document.getElementById("canvas").getContext("2d");
 
   upscaledCanvas.mozImageSmoothingEnabled = false;
@@ -295,22 +305,21 @@ function cropImage(image, x, y, w, h, cropX, cropY, cropW, cropH) {
   //upscaledCanvas.drawImage(img, -x, -y, w - x, h -, x, y, cropW, cropH);
 }
 function updateGameArea() {
+  var delta = (Date.now() - lastRender) / 1000;
+  lastRender = Date.now();
   myGameArea.clear();
   myGameArea.frameNo += 1;
   drawMap();
   localPlayer.update();
+  fill("red");
+  setFontSize(30);
+  text(1 / delta + " FPS", 10, 30);
 
-  if (myGameArea.frameNo == 1 || everyinterval(150)) {
-    //myObstacles.push(
-    //  new component(10, x - height - gap, "green", x, height + gap)
-    //);
+  if (everyinterval(150)) {
   }
 
-  //myScore.text = "SCORE: " + myGameArea.frameNo;
-  //myScore.update();
-  //myGamePiece.newPos();
-  //myGamePiece.update();
   mousePressed = false;
+  keyPressed = -1;
 }
 
 function everyinterval(n) {
@@ -340,13 +349,6 @@ this.userInput = function () {
     move(0, 2);
   } //  Down
 };*/
-
-function getMousePosition(canvas, event) {
-  let rect = canvas.getBoundingClientRect();
-  let x = event.clientX - rect.left;
-  let y = event.clientY - rect.top;
-  console.log("Coordinate x: " + x, "Coordinate y: " + y);
-}
 
 export default class {
   component;
