@@ -316,13 +316,13 @@ class Player {
     let velX = 0,
       velY = 0;
 
-    if (keys[40]) {
+    /*if (keys[40]) {
       //DOWN
       this.placing--;
     } else if (keys[38]) {
       //UP
       this.placing++;
-    }
+    }*/
 
     if (keys[controls[4]] && this.talking == false) {
       //Talk key
@@ -478,6 +478,13 @@ let myGameArea = {
     });
     window.addEventListener("keyup", function (e) {
       keys[event.keyCode] = false;
+      if (event.keyCode == 40) {
+        //DOWN
+        localPlayer.placing--;
+      } else if (event.keyCode == 38) {
+        //UP
+        localPlayer.placing++;
+      }
     });
     this.interval = setInterval(updateGameArea, Math.round(1000 / 60));
   },
