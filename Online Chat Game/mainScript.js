@@ -8,22 +8,22 @@ function drawMap() {
     for (var j = 0; j < mapHeight; j++) {
       if (
         inArea(
-          (i + 1) * 64 + mapOffsetX,
-          (j + 1) * 64 + mapOffsetY,
+          (i + 1) * blockSize + mapOffsetX,
+          (j + 1) * blockSize + mapOffsetY,
           0,
           0,
-          width + 64,
-          height + 64
+          width + blockSize,
+          height + blockSize
         )
       ) {
         if (
           inArea(
             mouseX,
             mouseY,
-            i * 64 + mapOffsetX,
-            j * 64 + mapOffsetY,
-            64,
-            64
+            i * blockSize + mapOffsetX,
+            j * blockSize + mapOffsetY,
+            blockSize,
+            blockSize
           ) &&
           mousePressed
         ) {
@@ -33,10 +33,10 @@ function drawMap() {
         if (map[i][j] == 1) {
           renderImage(
             tiles[0],
-            i * 64 + mapOffsetX,
-            j * 64 + mapOffsetY,
-            64,
-            64
+            i * blockSize + mapOffsetX,
+            j * blockSize + mapOffsetY,
+            blockSize,
+            blockSize
           );
         } else if (map[i][j] == 2) {
           try {
@@ -50,10 +50,10 @@ function drawMap() {
             ) {
               renderImage(
                 tiles[0],
-                i * 64 + mapOffsetX,
-                j * 64 + mapOffsetY,
-                64,
-                64
+                i * blockSize + mapOffsetX,
+                j * blockSize + mapOffsetY,
+                blockSize,
+                blockSize
               );
             }
 
@@ -64,10 +64,10 @@ function drawMap() {
             ) {
               cropImage(
                 tiles[1],
-                i * 64 + mapOffsetX,
-                j * 64 + mapOffsetY,
-                64,
-                64,
+                i * blockSize + mapOffsetX,
+                j * blockSize + mapOffsetY,
+                blockSize,
+                blockSize,
                 1 * 16,
                 0,
                 16,
@@ -79,8 +79,22 @@ function drawMap() {
               map[i][j + 1] != 2
             ) {
               saveScreenSettings();
-              rotate(i * 64 + 64 + mapOffsetX, j * 64 + 64 + mapOffsetY, 180);
-              cropImage(tiles[1], 0, 0, 64, 64, 1 * 16, 0, 16, 16);
+              rotate(
+                i * blockSize + blockSize + mapOffsetX,
+                j * blockSize + blockSize + mapOffsetY,
+                180
+              );
+              cropImage(
+                tiles[1],
+                0,
+                0,
+                blockSize,
+                blockSize,
+                1 * 16,
+                0,
+                16,
+                16
+              );
               restoreScreenSettings();
             } else if (
               map[i][j + 1] == 2 &&
@@ -88,8 +102,22 @@ function drawMap() {
               map[i + 1][j] != 2
             ) {
               saveScreenSettings();
-              rotate(i * 64 + mapOffsetX, j * 64 + mapOffsetY, 90);
-              cropImage(tiles[1], 0, -64, 64, 64, 1 * 16, 0, 16, 16);
+              rotate(
+                i * blockSize + mapOffsetX,
+                j * blockSize + mapOffsetY,
+                90
+              );
+              cropImage(
+                tiles[1],
+                0,
+                -blockSize,
+                blockSize,
+                blockSize,
+                1 * 16,
+                0,
+                16,
+                16
+              );
               restoreScreenSettings();
             } else if (
               map[i][j + 1] == 2 &&
@@ -97,8 +125,22 @@ function drawMap() {
               map[i - 1][j] != 2
             ) {
               saveScreenSettings();
-              rotate(i * 64 + mapOffsetX, j * 64 + mapOffsetY, 90 + 180);
-              cropImage(tiles[1], -64, 0, 64, 64, 1 * 16, 0, 16, 16);
+              rotate(
+                i * blockSize + mapOffsetX,
+                j * blockSize + mapOffsetY,
+                90 + 180
+              );
+              cropImage(
+                tiles[1],
+                -blockSize,
+                0,
+                blockSize,
+                blockSize,
+                1 * 16,
+                0,
+                16,
+                16
+              );
               restoreScreenSettings();
             } else if (
               map[i + 1][j] == 2 &&
@@ -107,10 +149,10 @@ function drawMap() {
             ) {
               cropImage(
                 tiles[1],
-                i * 64 + mapOffsetX,
-                j * 64 + mapOffsetY,
-                64,
-                64,
+                i * blockSize + mapOffsetX,
+                j * blockSize + mapOffsetY,
+                blockSize,
+                blockSize,
                 2 * 16,
                 0,
                 16,
@@ -122,8 +164,22 @@ function drawMap() {
               map[i][j + 1] == 2
             ) {
               saveScreenSettings();
-              rotate(i * 64 + mapOffsetX, j * 64 + mapOffsetY, 90);
-              cropImage(tiles[1], 0, -64, 64, 64, 2 * 16, 0, 16, 16);
+              rotate(
+                i * blockSize + mapOffsetX,
+                j * blockSize + mapOffsetY,
+                90
+              );
+              cropImage(
+                tiles[1],
+                0,
+                -blockSize,
+                blockSize,
+                blockSize,
+                2 * 16,
+                0,
+                16,
+                16
+              );
               restoreScreenSettings();
             } else if (
               map[i - 1][j] == 2 &&
@@ -132,8 +188,22 @@ function drawMap() {
               map[i + 1][j] != 2
             ) {
               saveScreenSettings();
-              rotate(i * 64 + mapOffsetX, j * 64 + mapOffsetY, 180);
-              cropImage(tiles[1], -64, -64, 64, 64, 2 * 16, 0, 16, 16);
+              rotate(
+                i * blockSize + mapOffsetX,
+                j * blockSize + mapOffsetY,
+                180
+              );
+              cropImage(
+                tiles[1],
+                -blockSize,
+                -blockSize,
+                blockSize,
+                blockSize,
+                2 * 16,
+                0,
+                16,
+                16
+              );
               restoreScreenSettings();
             } else if (
               map[i + 1][j] == 2 &&
@@ -142,16 +212,30 @@ function drawMap() {
               map[i - 1][j] != 2
             ) {
               saveScreenSettings();
-              rotate(i * 64 + mapOffsetX, j * 64 + mapOffsetY, 270);
-              cropImage(tiles[1], -64, 0, 64, 64, 2 * 16, 0, 16, 16);
+              rotate(
+                i * blockSize + mapOffsetX,
+                j * blockSize + mapOffsetY,
+                270
+              );
+              cropImage(
+                tiles[1],
+                -blockSize,
+                0,
+                blockSize,
+                blockSize,
+                2 * 16,
+                0,
+                16,
+                16
+              );
               restoreScreenSettings();
             } else {
               cropImage(
                 tiles[1],
-                i * 64 + mapOffsetX,
-                j * 64 + mapOffsetY,
-                64,
-                64,
+                i * blockSize + mapOffsetX,
+                j * blockSize + mapOffsetY,
+                blockSize,
+                blockSize,
                 0 * 16,
                 0,
                 16,
@@ -161,10 +245,10 @@ function drawMap() {
           } catch (error) {
             cropImage(
               tiles[1],
-              i * 64 + mapOffsetX,
-              j * 64 + mapOffsetY,
-              64,
-              64,
+              i * blockSize + mapOffsetX,
+              j * blockSize + mapOffsetY,
+              blockSize,
+              blockSize,
               0 * 16,
               0,
               16,
@@ -185,10 +269,10 @@ function drawMap() {
             if (map[i][j - 1] == 3) {
               cropImage(
                 tiles[2],
-                i * 64 + mapOffsetX,
-                j * 64 + mapOffsetY,
-                64,
-                64,
+                i * blockSize + mapOffsetX,
+                j * blockSize + mapOffsetY,
+                blockSize,
+                blockSize,
                 0 * 16,
                 0,
                 16,
@@ -197,10 +281,10 @@ function drawMap() {
             } else {
               cropImage(
                 tiles[2],
-                i * 64 + mapOffsetX,
-                j * 64 + mapOffsetY,
-                64,
-                64,
+                i * blockSize + mapOffsetX,
+                j * blockSize + mapOffsetY,
+                blockSize,
+                blockSize,
                 1 * 16,
                 0,
                 16,
@@ -422,6 +506,7 @@ tiles[2].src = "./Assets/Blocks/StoneBrickWall.png";
 
 let mapWidth = 500;
 let mapHeight = 500;
+let blockSize = 64;
 
 var map = new Array(mapWidth);
 for (var i = 0; i < mapWidth; i++) {
