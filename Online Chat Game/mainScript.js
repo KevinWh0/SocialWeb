@@ -474,7 +474,7 @@ let myGameArea = {
     window.addEventListener("keydown", function (e) {
       keys[event.keyCode] = true;
       keyPressed = event.keyCode;
-      //  console.log(event.keyCode);
+      //console.log(event.keyCode);
     });
     window.addEventListener("keyup", function (e) {
       keys[event.keyCode] = false;
@@ -489,7 +489,14 @@ let myGameArea = {
 startGame();
 
 function startGame() {
-  console.log(readTextFile("./Maps/Home.txt"));
+  //readTextFile("https://kevinwh0.github.io/SocialWeb/Online%20Chat%20Game/Maps/Home.txt")
+  (async () => {
+    console.log(
+      await readTextFile(
+        "https://kevinwh0.github.io/SocialWeb/Online%20Chat%20Game/Maps/Home.txt"
+      )
+    );
+  })();
   localPlayer = new Player(0, 0);
 
   myGamePiece = new component(30, 30, "red", 10, 120);
@@ -607,13 +614,55 @@ function restoreScreenSettings() {
   var upscaledCanvas = document.getElementById("canvas").getContext("2d");
   upscaledCanvas.restore();
 }
+async function readTextFile(url) {
+  /*
+  NOTE:
+  to use this you need to do somthing like this:
+    (async () => {
+    console.log(
+      await readTextFile(
+        "https://kevinwh0.github.io/SocialWeb/Online%20Chat%20Game/Maps/Home.txt"
+      )
+    );
+  })();
+  */
+  const response = await fetch(url);
+  return response.text();
+}
+// Function to download data to a file
+function download(data, filename, type) {
+  var file = new Blob([data], { type: type });
+  if (window.navigator.msSaveOrOpenBlob)
+    // IE10+
+    window.navigator.msSaveOrOpenBlob(file, filename);
+  else {
+    // Others
+    var a = document.createElement("a"),
+      url = URL.createObjectURL(file);
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 0);
+  }
+}
 
-async function readTextFile(file) {
-  const respon = await fetch(file)
-    .then((response) => response.text())
-    .then((text) => {});
+function DownloadWorld() {
+  if (keys[220]) {
+    var downloadData = mapWidth + " " + mapHeight + "\n";
 
-  return respon;
+    for (var i = 0; i < mapWidth; i++) {
+      for (var j = 0; j < mapHeight; j++) {
+        downloadData = downloadData + " " + map[i][j];
+        //map[i][j] = Math.round(Math.random(2)) + 1;
+      }
+    }
+
+    download(downloadData, "tst.txt", "test");
+  }
 }
 
 function updateGameArea() {
@@ -622,6 +671,7 @@ function updateGameArea() {
   myGameArea.clear();
   myGameArea.frameNo += 1;
   drawMap();
+  DownloadWorld();
   localPlayer.update();
 
   fps = Math.round(1 / delta);
