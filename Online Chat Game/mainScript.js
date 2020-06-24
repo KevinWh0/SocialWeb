@@ -4,8 +4,8 @@ let mapOffsetY = 0;
 function drawMap() {
   mapOffsetX = -localPlayer.x;
   mapOffsetY = -localPlayer.y;
-  for (var i = 0; i < 40; i++) {
-    for (var j = 0; j < 20; j++) {
+  for (var i = 0; i < mapWidth; i++) {
+    for (var j = 0; j < mapHeight; j++) {
       if (
         inArea(
           (i + 1) * 64 + mapOffsetX,
@@ -420,11 +420,11 @@ tiles[0].src = "./Assets/Blocks/FloorTile.png";
 tiles[1].src = "./Assets/Blocks/Carpet.png";
 tiles[2].src = "./Assets/Blocks/StoneBrickWall.png";
 
-let mapWidth = 200;
-let mapHeight = 200;
+let mapWidth = 500;
+let mapHeight = 500;
 
 var map = new Array(mapWidth);
-for (var i = 0; i < map.length; i++) {
+for (var i = 0; i < mapWidth; i++) {
   map[i] = new Array(mapHeight);
 }
 
@@ -488,8 +488,8 @@ let myGameArea = {
 
 startGame();
 var loadfileData;
-function startGame() {
-  //readTextFile("https://kevinwh0.github.io/SocialWeb/Online%20Chat%20Game/Maps/Home.txt")
+
+function loadWorld() {
   (async () => {
     loadfileData = await readTextFile(
       "https://kevinwh0.github.io/SocialWeb/Online%20Chat%20Game/Maps/Home.txt"
@@ -512,6 +512,10 @@ function startGame() {
       }
     }
   })();
+}
+function startGame() {
+  //readTextFile("https://kevinwh0.github.io/SocialWeb/Online%20Chat%20Game/Maps/Home.txt")
+  loadWorld();
   localPlayer = new Player(0, 0);
 
   myGamePiece = new component(30, 30, "red", 10, 120);
