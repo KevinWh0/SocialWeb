@@ -487,15 +487,30 @@ let myGameArea = {
 };
 
 startGame();
-
+var loadfileData;
 function startGame() {
   //readTextFile("https://kevinwh0.github.io/SocialWeb/Online%20Chat%20Game/Maps/Home.txt")
   (async () => {
-    console.log(
-      await readTextFile(
-        "https://kevinwh0.github.io/SocialWeb/Online%20Chat%20Game/Maps/Home.txt"
-      )
+    loadfileData = await readTextFile(
+      "https://kevinwh0.github.io/SocialWeb/Online%20Chat%20Game/Maps/Home.txt"
     );
+
+    var spl = loadfileData.split("\n");
+    var dimentions = spl[0].split(" ");
+    var blocks = spl[1].split(" ");
+
+    mapWidth = parseInt(dimentions[0]);
+    mapHeight = parseInt(dimentions[1]);
+    console.log(spl);
+    var i1 = 0;
+    for (var i = 0; i < mapWidth; i++) {
+      for (var j = 0; j < mapHeight; j++) {
+        i1++;
+
+        map[i][j] = parseInt(blocks[i1]);
+        //map[i][j] = Math.round(Math.random(2)) + 1;
+      }
+    }
   })();
   localPlayer = new Player(0, 0);
 
